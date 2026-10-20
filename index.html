@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ساعتي الرقمية</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI', Tahoma}
+body{background:#0f172a;color:white;min-height:100vh}
+nav{background:#1e293b;padding:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+.logo{font-weight:bold;font-size:20px;color:#38bdf8}
+.menu{display:flex;gap:8px;flex-wrap:wrap}
+.menu button{background:#334155;border:none;color:white;padding:8px 14px;border-radius:20px;cursor:pointer;transition:0.3s}
+.menu button.active,.menu button:hover{background:#38bdf8;color:#000}
+.page{display:none;padding:30px;text-align:center;animation:fade 0.3s}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.clock{font-size:70px;font-weight:bold;letter-spacing:3px;margin:20px 0;color:#38bdf8;text-shadow:0 0 20px #38bdf8}
+.date{font-size:18px;color:#94a3b8}
+.card{background:#1e293b;padding:20px;border-radius:15px;margin:15px auto;max-width:500px;box-shadow:0 5px 15px rgba(0,0,0,0.3)}
+.btn{padding:10px 20px;border:none;border-radius:8px;margin:5px;cursor:pointer;font-weight:bold}
+.start{background:#22c55e;color:white}.stop{background:#ef4444;color:white}.reset{background:#64748b;color:white}
+.world-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;max-width:800px;margin:auto}
+.world-item{background:#1e293b;padding:20px;border-radius:12px}
+.world-item h3{color:#fbbf24}.world-time{font-size:28px;margin-top:10px;color:#38bdf8}
+input,textarea,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;background:#334155;color:white}
+.contact-btn{background:#38bdf8;width:100%;padding:12px;font-size:16px}
+.laps{text-align:left;max-height:150px;overflow:auto;margin-top:10px;background:#0f172a;padding:10px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">⏰ ساعتي</div>
+  <div class="menu">
+    <button class="active" onclick="showPage('home')">Home</button>
+    <button onclick="showPage('world')">World Clock</button>
+    <button onclick="showPage('stopwatch')">Stop Watch</button>
+    <button onclick="showPage('timer')">Timer</button>
+    <button onclick="showPage('contact')">تواصل معنا</button>
+  </div>
+</nav>
+
+<!-- 1 HOME -->
+<div id="home" class="page active">
+  <h1>الساعة المحلية</h1>
+  <div class="clock" id="localClock">00:00:00</div>
+  <div class="date" id="localDate"></div>
+  <div class="card"><p>مرحباً بك في موقع الساعة الرقمية، دقة عالية وتصميم عصري</p></div>
+</div>
+
+<!-- 2 WORLD CLOCK -->
+<div id="world" class="page">
+  <h1>توقيت العالم</h1>
+  <div class="world-grid" id="worldGrid"></div>
+</div>
+
+<!-- 3 STOP WATCH -->
+<div id="stopwatch" class="page">
+  <h1>ساعة الإيقاف</h1>
+  <div class="clock" id="swDisplay">00:00:00.0</div>
+  <div>
+    <button class="btn start" onclick="startSW()">ابدأ</button>
+    <button class="btn stop" onclick="stopSW()">وقف</button>
+    <button class="btn reset" onclick="resetSW()">تصفير</button>
+    <button class="btn" style="background:#38bdf8" onclick="lapSW()">Lap</button>
+  </div>
+  <div class="card laps" id="laps"></div>
+</div>
+
+<!-- 4 TIMER -->
+<div id="timer" class="page">
+  <h1>المؤقت التنازلي</h1>
+  <div class="card">
+    <div style="display:flex;gap:10px">
+      <input type="number" id="tH" placeholder="ساعات" min="0">
+      <input type="number" id="tM" placeholder="دقايق" min="0" max="59">
+      <input type="number" id="tS" placeholder="ثواني" min="0" max="59">
+    </div>
+    <div class="clock" id="timerDisplay">00:00:00</div>
+    <button class="btn start" onclick="startTimer()">ابدأ المؤقت</button>
+    <button class="btn stop" onclick="stopTimer()">وقف</button>
+    <button class="btn reset" onclick="resetTimer()">تصفير</button>
+  </div>
+</div>
+
+<!-- 5 CONTACT -->
+<div id="contact" class="page">
+  <h1>تواصل معنا</h1>
+  <div class="card">
+    <input type="text" placeholder="اسمك">
+    <input type="email" placeholder="ايميلك">
+    <textarea rows="4" placeholder="رسالتك..."></textarea>
+    <button class="btn contact-btn" onclick="alert('تم ارسال رسالتك! شكراً ❤️')">ارسال</button>
+    <p style="margin-top:15px;color:#94a3b8">Email: clock@mysite.com | Tel: 0123456789</p>
+  </div>
+</div>
+
+<script>
+// التنقل
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// 1 HOME CLOCK
+setInterval(()=>{
+  const now=new Date();
+  document.getElementById('localClock').textContent=now.toLocaleTimeString('en-GB',{hour12:false});
+  document.getElementById('localDate').textContent=now.toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+},1000);
+
+// 2 WORLD CLOCK
+const zones=[
+  {city:'الخرطوم',zone:'Africa/Khartoum'},
+  {city:'مكة',zone:'Asia/Riyadh'},
+  {city:'دبي',zone:'Asia/Dubai'},
+  {city:'لندن',zone:'Europe/London'},
+  {city:'نيويورك',zone:'America/New_York'},
+  {city:'طوكيو',zone:'Asia/Tokyo'}
+];
+function updateWorld(){
+  const grid=document.getElementById('worldGrid');
+  grid.innerHTML='';
+  zones.forEach(z=>{
+    const time=new Date().toLocaleTimeString('en-GB',{timeZone:z.zone,hour12:false});
+    grid.innerHTML+=`<div class="world-item"><h3>${z.city}</h3><div class="world-time">${time}</div><small>${z.zone}</small></div>`;
+  });
+}
+setInterval(updateWorld,1000);updateWorld();
+
+// 3 STOPWATCH
+let swInterval, swMs=0;
+function updateSW(){ 
+  let ms=swMs%100; let s=Math.floor(swMs/100)%60; let m=Math.floor(swMs/6000)%60; let h=Math.floor(swMs/360000);
+  document.getElementById('swDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`;
+}
+function startSW(){ if(!swInterval) swInterval=setInterval(()=>{swMs++;updateSW()},10); }
+function stopSW(){ clearInterval(swInterval); swInterval=null; }
+function resetSW(){ stopSW(); swMs=0; updateSW(); document.getElementById('laps').innerHTML=''; }
+function lapSW(){ 
+  const div=document.getElementById('laps');
+  div.innerHTML+=`<div> Lap ${div.children.length+1} - ${document.getElementById('swDisplay').textContent}</div>`;
+}
+
+// 4 TIMER
+let timerInterval, totalSec=0;
+function updateTimerDisplay(){
+  let h=Math.floor(totalSec/3600); let m=Math.floor((totalSec%3600)/60); let s=totalSec%60;
+  document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function startTimer(){
+  if(timerInterval) return;
+  if(totalSec==0){
+    let h=parseInt(document.getElementById('tH').value)||0;
+    let m=parseInt(document.getElementById('tM').value)||0;
+    let s=parseInt(document.getElementById('tS').value)||0;
+    totalSec=h*3600+m*60+s;
+  }
+  if(totalSec<=0) return alert('دخل زمن أول');
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{
+    totalSec--; updateTimerDisplay();
+    if(totalSec<=0){ clearInterval(timerInterval); timerInterval=null; alert('انتهى الوقت! ⏰'); new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); }
+  },1000);
+}
+function stopTimer(){ clearInterval(timerInterval); timerInterval=null; }
+function resetTimer(){ stopTimer(); totalSec=0; updateTimerDisplay(); }
+</script>
+</body>
+</html>
