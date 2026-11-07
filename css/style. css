@@ -28,8 +28,7 @@ nav {
 .logo {
     font-weight: bold;
     font-size: 20px;
-    color: #38bdf8;
-}
+    color: #38bdf8;}
 
 .menu {
     display: flex;
